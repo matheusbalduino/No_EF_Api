@@ -52,5 +52,7 @@ namespace No_EF_Api.Controllers
                 sqlConnection.Close();
             }
         }
+
+        //função para exibir
     }
 }
