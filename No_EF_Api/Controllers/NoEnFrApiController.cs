@@ -49,10 +49,62 @@ namespace No_EF_Api.Controllers
             }
             finally
             {
-                sqlConnection.Close();
+                if (sqlConnection != null)
+                {
+                    sqlConnection.Close();
+                    sqlConnection.Dispose();
+                }
+               
             }
         }
 
-        //função para exibir
+        [HttpGet]
+        public IActionResult index()
+        {
+            SqlConnection sqlConnection = null;
+            List<Users> users = new List<Users>();
+            Users user;
+            try
+            {
+                sqlConnection = new SqlConnection(_configuration.GetConnectionString("testeApi"));
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand("getAllUsers", sqlConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        user = new Users()
+                        {
+                            UserId = reader.GetInt32("UserId"),
+                            Nome = reader.GetString("Nome"),
+                            Obs = reader.GetString("Obs")
+                        };
+                            
+                        users.Add(user);
+                    }
+                }
+
+                return Ok(users);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                if (sqlConnection != null)
+                {
+                    sqlConnection.Close();
+                    sqlConnection.Dispose();
+                }
+
+            }
+        }
     }
 }
